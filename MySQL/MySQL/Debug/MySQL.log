@@ -1,3 +1,15 @@
 ﻿  Analyse.cpp
-c:\users\11546\desktop\程序设计基础实验\项目2\mysql\mysql\analyse.cpp(90): warning C4018: “<”: 有符号/无符号不匹配
+C:\Users\11546\Desktop\程序设计基础实验\项目2\MySQL\MySQL\Analyse.cpp(267): warning C4018: “<”: 有符号/无符号不匹配
+C:\Users\11546\Desktop\程序设计基础实验\项目2\MySQL\MySQL\Analyse.cpp(297): warning C4018: “<”: 有符号/无符号不匹配
+C:\Users\11546\Desktop\程序设计基础实验\项目2\MySQL\MySQL\Analyse.cpp(315): warning C4018: “<”: 有符号/无符号不匹配
+C:\Users\11546\Desktop\程序设计基础实验\项目2\MySQL\MySQL\Analyse.cpp(333): warning C4018: “<”: 有符号/无符号不匹配
+C:\Users\11546\Desktop\程序设计基础实验\项目2\MySQL\MySQL\Analyse.cpp(352): warning C4018: “<”: 有符号/无符号不匹配
+C:\Users\11546\Desktop\程序设计基础实验\项目2\MySQL\MySQL\Analyse.cpp(378): warning C4018: “<”: 有符号/无符号不匹配
+C:\Users\11546\Desktop\程序设计基础实验\项目2\MySQL\MySQL\Analyse.cpp(383): warning C4018: “<=”: 有符号/无符号不匹配
+C:\Users\11546\Desktop\程序设计基础实验\项目2\MySQL\MySQL\Analyse.cpp(404): warning C4018: “<”: 有符号/无符号不匹配
+C:\Users\11546\Desktop\程序设计基础实验\项目2\MySQL\MySQL\Analyse.cpp(409): warning C4018: “<=”: 有符号/无符号不匹配
+  main.cpp
+  Table.cpp
+  User.cpp
+  正在生成代码...
   MySQL.vcxproj -> C:\Users\11546\Desktop\程序设计基础实验\项目2\MySQL\Debug\MySQL.exe

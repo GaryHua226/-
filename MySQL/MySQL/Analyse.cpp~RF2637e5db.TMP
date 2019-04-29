@@ -184,7 +184,7 @@ bool Analyse::table_list(const string&order)
 {
 	Analyse a;
 	vector<string> word;
-	a.split(order, word, " ");
+	a.split_all(order, word, " ");
 	if (word.size() == 2 && word[0] == "TABLE"&&word[1] == "LIST")
 	{
 		return true;
@@ -268,7 +268,7 @@ bool Analyse::select(const string& order)
 	{
 		word[i] = word[i].substr(0, word[i].length() - 1);
 	}
-	if (word[0] == "SELECT"&&word[1]!="DISTINC"&&word[word.size()-2] == "FROM"&&word[word.size()-1] != ""&&word[word.size()-1]!="ASC"&& word[word.size() - 1] != "DESC"&& word[word.size() - 2] != "="&& word[word.size() - 2] != "TO")
+	if (word[0] == "SELECT"&&word[1]!="DISTINC"&&word[word.size()-2] == "FROM"&&word[word.size()-1] != ""&&word[word.size()-1]!="ASC"&& word[word.size() - 1] != "DESC"&& word[word.size() - 2] != "=")
 	{
 		return true;
 	}
@@ -316,6 +316,10 @@ bool Analyse::select_sort(const string& order)
 	{
 		word[i] = word[i].substr(0, word[i].length() - 1);
 	}
+	for (int i = 0; i < word.size(); i++)
+	{
+		cout << word[i] << endl;
+	}
 	if (word[0] == "SELECT"&&word[1] == "*"&&word[2]=="FROM"&&word[3] != ""&&word[4] == "ORDER"&&word[5] == "BY"&&(word[word.size() - 1] == "ASC"||word[word.size() - 1] == "DESC"))
 	{
 		return true;
@@ -334,86 +338,11 @@ bool Analyse::select_some(const string& order)
 	{
 		word[i] = word[i].substr(0, word[i].length() - 1);
 	}
-
+	for (int i = 0; i < word.size(); i++)
+	{
+		cout << word[i] << endl;
+	}
 	if (word[0] == "SELECT"&&word[1]!=""&& word[word.size() - 6] == "FROM"&& word[word.size() - 5] != ""&& word[word.size() - 4] == "WHERE"&& word[word.size() - 3] != "" && word[word.size() - 2] == "=" && word[word.size() - 1] != "")
-	{
-		return true;
-	}
-	return false;
-}
-
-bool Analyse::select_file(const string& order)
-{
-	Analyse a;
-	vector<string> word;
-	a.split(order, word, " ");
-	if (word.size() < 6)
-		return false;
-	for (int i = 1; i < word.size() - 5; i++)
-	{
-		word[i] = word[i].substr(0, word[i].length() - 1);
-	}
-	if (word[0] == "SELECT"&&word[1] != "" && word[word.size() - 4] == "FROM"  && word[word.size() - 3] != ""  && word[word.size() - 2] == "TO" && word[word.size() - 1] != "")
-	{
-		smatch result;
-		regex pattern("(.*)(.{4})");
-		if (regex_match(word[word.size() - 1], result, pattern))
-		{
-			if (result[2] == ".txt")
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-bool Analyse::grant(const string &order)
-{
-	Analyse a;
-	vector<string> word;
-	a.split(order, word, " ");
-	if (word.size() < 6)
-		return false;
-	for (int i = 1; i < word.size() - 5; i++)
-	{
-		word[i] = word[i].substr(0, word[i].length() - 1);
-	}
-	int count = 0;
-	for (int i = 1; i <= word.size()-5; i++)
-	{
-		if (word[i] == "INSERT" || word[i] == "DELETE" || word[i] == "DROP" || word[i] == "SELECT")
-		{
-			count++;
-		}
-	}
-	if (word[0] == "GRANT"&&count==word.size()-5 && word[word.size() - 4] == "on"&&word[word.size() - 3] != ""&&word[word.size() - 2] == "to"&&word[word.size() - 1] != "" )
-	{
-		return true;
-	}
-	return false;
-}
-
-bool Analyse::revoke(const string&order)
-{
-	Analyse a;
-	vector<string> word;
-	a.split(order, word, " ");
-	if (word.size() < 6)
-		return false;
-	for (int i = 1; i < word.size() - 5; i++)
-	{
-		word[i] = word[i].substr(0, word[i].length() - 1);
-	}
-	int count = 0;
-	for (int i = 1; i <= word.size() - 5; i++)
-	{
-		if (word[i] == "INSERT" || word[i] == "DELETE" || word[i] == "DROP" || word[i] == "SELECT")
-		{
-			count++;
-		}
-	}
-	if (word[0] == "REVOKE"&&count == word.size() - 5 && word[word.size() - 4] == "on"&&word[word.size() - 3] != ""&&word[word.size() - 2] == "from"&&word[word.size() - 1] != "")
 	{
 		return true;
 	}

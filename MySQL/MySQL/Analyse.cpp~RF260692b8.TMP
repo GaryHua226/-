@@ -4,6 +4,7 @@ void Analyse::split(const string& order, vector<string>& v, const string& separa
 {
 	string::size_type pos_sub_begin; // 子串开始位置  
 	string::size_type pos_sep;//分隔符位置  
+	string::size_type pos_end;
 	pos_sep = order.find(separator);
 	pos_sub_begin = 0;
 	while (string::npos != pos_sep)
@@ -103,7 +104,7 @@ void Analyse::split_insert_distinct(const string& order, vector<string>&v, const
 	}
 }
 
-void Analyse::split_insert_distinct_col(const string& order, vector<string>&v,vector<string>&val, const string& separator)
+void Analyse::split_insert_distinct_col(const string& order, vector<string>&v, const string& separator)
 {
 	string::size_type pos_sub_begin; // 子串开始位置  
 	string::size_type pos_sep;//分隔符位置  
@@ -111,27 +112,20 @@ void Analyse::split_insert_distinct_col(const string& order, vector<string>&v,ve
 	pos_sep = order.find(separator);
 	pos_sub_begin = order.find("(") + 1;
 	pos_end = order.find(")");
-	while (string::npos != pos_sep && pos_sep < order.find("(", order.find(")")))
+	for (int i = 0; i < 1; i++)
 	{
-		v.push_back(order.substr(pos_sub_begin, pos_sep - pos_sub_begin));
-		pos_sub_begin = pos_sep + separator.size();
+		while (string::npos != pos_sep)
+		{
+			v.push_back(order.substr(pos_sub_begin, pos_sep - pos_sub_begin));
+			pos_sub_begin = pos_sep + separator.size();
+			pos_sep = order.find(separator, pos_sub_begin);
+		}
+		if (pos_sub_begin < pos_end)// 截取最后一段数据     
+			v.push_back(order.substr(pos_sub_begin, pos_end - pos_sub_begin));
+		pos_sub_begin = order.find("(",order.find(")") )+ 1;
+		pos_end = order.find(")", pos_sub_begin);
 		pos_sep = order.find(separator, pos_sub_begin);
 	}
-	if (pos_sub_begin < pos_end)// 截取最后一段数据     
-		v.push_back(order.substr(pos_sub_begin, pos_end - pos_sub_begin));
-	
-	pos_sub_begin = order.find("(", order.find(")")) + 1;
-	pos_end = order.find(")", pos_sub_begin);
-	pos_sep = order.find(separator, pos_sub_begin);
-
-	while (string::npos != pos_sep)
-	{
-		val.push_back(order.substr(pos_sub_begin, pos_sep - pos_sub_begin));
-		pos_sub_begin = pos_sep + separator.size();
-		pos_sep = order.find(separator, pos_sub_begin);
-	}
-	if (pos_sub_begin < pos_end)// 截取最后一段数据     
-		val.push_back(order.substr(pos_sub_begin, pos_end - pos_sub_begin));
 }
 	
 bool Analyse::create(const string& order)
@@ -184,7 +178,7 @@ bool Analyse::table_list(const string&order)
 {
 	Analyse a;
 	vector<string> word;
-	a.split(order, word, " ");
+	a.split_all(order, word, " ");
 	if (word.size() == 2 && word[0] == "TABLE"&&word[1] == "LIST")
 	{
 		return true;
@@ -222,11 +216,19 @@ bool Analyse::insert_distinct(const string& order)
 {
 	Analyse a;
 	vector<string> col;
-	vector<string>value;
-	a.split_insert_distinct_col(order, col,value, ", ");
+	a.split_insert_distinct_col(order, col, ", ");
 	vector<string> word;
 	a.split_insert_distinct(order, word, " ");
-	if (col.size()==value.size()&&word.size() == 4 && word[0] == "INSERT"&&word[1] == "INTO"&&word[2] != ""&&word[3] == "VALUES")
+	vector<string> value;
+	for (int i = 0; i < col.size(); i++)
+	{
+		cout << col[i] << endl;
+	}
+	for (int i = 0; i < word.size(); i++)
+	{
+		cout << word[i] << endl;
+	}
+	if (word.size() == 4 && word[0] == "INSERT"&&word[1] == "INTO"&&word[2] != ""&&word[3] == "VALUES")
 	{
 		return true;
 	}
@@ -257,23 +259,7 @@ bool Analyse::delete_all(const string& order)
 	return false;
 }
 
-bool Analyse::select(const string& order)
-{
-	Analyse a;
-	vector<string> word;
-	a.split(order, word, " ");
-	if (word.size() < 4)
-		return false;
-	for (int i = 1; i < word.size() - 2; i++)
-	{
-		word[i] = word[i].substr(0, word[i].length() - 1);
-	}
-	if (word[0] == "SELECT"&&word[1]!="DISTINC"&&word[word.size()-2] == "FROM"&&word[word.size()-1] != ""&&word[word.size()-1]!="ASC"&& word[word.size() - 1] != "DESC"&& word[word.size() - 2] != "="&& word[word.size() - 2] != "TO")
-	{
-		return true;
-	}
-	return false;
-}
+
 
 bool Analyse::select_all(const string& order)
 {
@@ -281,139 +267,6 @@ bool Analyse::select_all(const string& order)
 	vector<string> word;
 	a.split(order, word, " ");
 	if (word.size() == 4 && word[0] == "SELECT"&&word[1] == "*"&&word[2] == "FROM"&&word[3] != "")
-	{
-		return true;
-	}
-	return false;
-}
-
-bool Analyse::select_distinct(const string& order)
-{
-	Analyse a;
-	vector<string> word;
-	a.split(order, word, " ");
-	if (word.size() < 5)
-		return false;
-	for (int i = 2; i < word.size() - 2; i++)
-	{
-		word[i] = word[i].substr(0, word[i].length() - 1);
-	}
-	if (word[0] == "SELECT"&&word[1]=="DISTINCT"&&word[word.size() - 2] == "FROM"&&word[word.size() - 1] != "" && word[word.size() - 1] != "ASC" && word[word.size() - 1] != "DESC")
-	{
-		return true;
-	}
-	return false;
-}
-
-bool Analyse::select_sort(const string& order)
-{
-	Analyse a;
-	vector<string> word;
-	a.split(order, word, " ");
-	if (word.size() < 8)
-		return false;
-	for (int i = 6; i < word.size() - 2; i++)
-	{
-		word[i] = word[i].substr(0, word[i].length() - 1);
-	}
-	if (word[0] == "SELECT"&&word[1] == "*"&&word[2]=="FROM"&&word[3] != ""&&word[4] == "ORDER"&&word[5] == "BY"&&(word[word.size() - 1] == "ASC"||word[word.size() - 1] == "DESC"))
-	{
-		return true;
-	}
-	return false;
-}
-
-bool Analyse::select_some(const string& order)
-{
-	Analyse a;
-	vector<string> word;
-	a.split(order, word, " ");
-	if (word.size() < 8)
-		return false;
-	for (int i = 1; i < word.size() - 7; i++)
-	{
-		word[i] = word[i].substr(0, word[i].length() - 1);
-	}
-
-	if (word[0] == "SELECT"&&word[1]!=""&& word[word.size() - 6] == "FROM"&& word[word.size() - 5] != ""&& word[word.size() - 4] == "WHERE"&& word[word.size() - 3] != "" && word[word.size() - 2] == "=" && word[word.size() - 1] != "")
-	{
-		return true;
-	}
-	return false;
-}
-
-bool Analyse::select_file(const string& order)
-{
-	Analyse a;
-	vector<string> word;
-	a.split(order, word, " ");
-	if (word.size() < 6)
-		return false;
-	for (int i = 1; i < word.size() - 5; i++)
-	{
-		word[i] = word[i].substr(0, word[i].length() - 1);
-	}
-	if (word[0] == "SELECT"&&word[1] != "" && word[word.size() - 4] == "FROM"  && word[word.size() - 3] != ""  && word[word.size() - 2] == "TO" && word[word.size() - 1] != "")
-	{
-		smatch result;
-		regex pattern("(.*)(.{4})");
-		if (regex_match(word[word.size() - 1], result, pattern))
-		{
-			if (result[2] == ".txt")
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-bool Analyse::grant(const string &order)
-{
-	Analyse a;
-	vector<string> word;
-	a.split(order, word, " ");
-	if (word.size() < 6)
-		return false;
-	for (int i = 1; i < word.size() - 5; i++)
-	{
-		word[i] = word[i].substr(0, word[i].length() - 1);
-	}
-	int count = 0;
-	for (int i = 1; i <= word.size()-5; i++)
-	{
-		if (word[i] == "INSERT" || word[i] == "DELETE" || word[i] == "DROP" || word[i] == "SELECT")
-		{
-			count++;
-		}
-	}
-	if (word[0] == "GRANT"&&count==word.size()-5 && word[word.size() - 4] == "on"&&word[word.size() - 3] != ""&&word[word.size() - 2] == "to"&&word[word.size() - 1] != "" )
-	{
-		return true;
-	}
-	return false;
-}
-
-bool Analyse::revoke(const string&order)
-{
-	Analyse a;
-	vector<string> word;
-	a.split(order, word, " ");
-	if (word.size() < 6)
-		return false;
-	for (int i = 1; i < word.size() - 5; i++)
-	{
-		word[i] = word[i].substr(0, word[i].length() - 1);
-	}
-	int count = 0;
-	for (int i = 1; i <= word.size() - 5; i++)
-	{
-		if (word[i] == "INSERT" || word[i] == "DELETE" || word[i] == "DROP" || word[i] == "SELECT")
-		{
-			count++;
-		}
-	}
-	if (word[0] == "REVOKE"&&count == word.size() - 5 && word[word.size() - 4] == "on"&&word[word.size() - 3] != ""&&word[word.size() - 2] == "from"&&word[word.size() - 1] != "")
 	{
 		return true;
 	}

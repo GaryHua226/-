@@ -1,0 +1,210 @@
+#include<iostream>
+#include<string>
+#include<regex>
+#include<vector>
+
+#include"Analyse.h"
+#include"Table.h"
+#include"User.h"
+using namespace std;
+inline void print_$()
+{
+	cout << "~$ ";
+}
+inline void print_arrow()
+{
+	cout << "(mysql)==> ";
+}
+
+//测试创建的table是否已经存在
+bool is_valid_create(vector<Table> all_table, Table test_table)
+{
+	vector<Table>::iterator index = all_table.begin();
+	for (; index != all_table.end(); index++)
+		if (index->filename == test_table.filename)
+		{
+			cout << "this file name has been occupied by a table." << endl;
+			return true;
+		}
+		else if (index->name == test_table.name)
+		{
+			cout << "this table name has been occipied by a table." << endl;
+			return true;
+		}
+	return false;
+}
+
+void list_all_table(vector<Table>& all_table, User user)
+{
+	vector<Table>::iterator index = all_table.begin();
+	int total = 0;
+	for (; index != all_table.end(); index++)
+	{
+		if (index->owner == user.name)
+		{
+			total++;
+			cout << "        " << index->name << ":" << " (" << index->colum << "," << index->row << ") ";
+			cout << "[";
+
+			for (int i=0;i < (int)index->content[0].size();i++)
+			{
+				cout <<index->content[0][i];
+				if (i != index->content[0].size()-1)
+					cout << " ";
+				else
+					cout << "]";
+			}
+
+			cout << " DROP INSERT DELETE SELECT ";
+
+			cout << "[owner]" << endl;	
+		}
+
+		/*
+		else if(this user has the access to the table )
+		{	
+			total++;
+			cout << "        " << index->name << ":" << " (" << index->colum << "," << index->row << ") ";
+			cout << "[";
+
+			for (int i=0;i < (int)index->content[0].size();i++)
+			{
+				cout <<index->content[0][i];
+				if (i != index->content[0].size()-1)
+					cout << " ";
+				else
+					cout << "]";
+			}
+
+			cout << "(THE authority the user has) ";
+
+			cout << "[user]" << endl;
+		}
+		*/
+
+	}
+	cout << "    total:" << total<<endl;
+}
+
+bool is_exist_table_name(vector<Table> all_table, string name)
+{
+	vector<Table>::iterator index = all_table.begin();
+	for (; index != all_table.end(); index++)
+		if (index->name == name)
+		{
+			return true;
+		}
+	return false;
+}
+
+int main()
+{
+	vector<Table> all_table;
+	Analyse a;
+	/*while (1)
+	{
+		print_$();
+		string command;
+		getline(cin,command);
+		if (command == "mySQL")
+		{*/
+
+	User test;
+	test.name = "guolihua";
+
+			while (1)//mysql内部
+			{
+				print_arrow();
+				string order;
+				getline(cin, order);
+				if (order == "quit")//退出mysql
+				{
+					break;
+				}
+				if (a.create(order))
+				{
+					Table table;
+					if (table.create_table(order))
+						if (!is_valid_create(all_table, table))
+						{
+							cout << "create successfully." << endl;
+							table.owner = test.name;
+							all_table.push_back(table);
+						}
+				}
+				else if (a.create_from_file(order))
+				{
+					Table table;
+					if (table.create_table_from_file(order))
+					{
+						if (!is_valid_create(all_table, table))
+						{
+							cout << "create successfully." << endl;
+							table.owner = test.name;
+							all_table.push_back(table);
+						}
+					}
+				}
+				else if (a.drop(order))
+				{
+					bool _drop = false;
+					vector<string> word;
+					a.split_all(order, word, " ");
+					vector<Table>::iterator index = all_table.begin();
+					for (; index != all_table.end(); index++)
+						if (index->name == word[2])
+						{
+							_drop = true;
+							index->drop_table();
+							all_table.erase(index);
+							cout << "Drop.\n";
+							break;
+						}
+					if(_drop==false)
+						cout << "no such table to drop." << endl;
+				}
+				else if (a.table_list(order))
+				{
+					list_all_table(all_table, test);
+				}
+				else if (a.insert_row(order))
+				{
+					
+				}
+				else if (a.insert_distinct(order))
+				{
+
+				}
+				else if (a.delete_row(order))
+				{
+
+				}
+				else if (a.delete_all(order))
+				{
+
+				}
+				else if (a.select(order))
+				{
+
+				}
+				else if (a.select_all(order))
+				{
+
+				}
+				else if (a.select_distinct(order))
+				{
+
+				}
+				else if (a.select_sort(order))
+				{
+
+				}
+				else
+				{
+					cout << "Illegal order.\n";
+				}
+			}/*
+		}
+	}*/
+	return 0;
+}
